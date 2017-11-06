@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>CRUD生成器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <link href="__STATIC__/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="__STATIC__/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+    <link href="__STATIC__/back/css/stylesheet.css" type="text/css" rel="stylesheet" media="screen" />
+    <script type="text/javascript" src="__STATIC__/jquery/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/bootstrap/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div id="container">
+    {include file="common/header" /}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <a onclick="getInfo()" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="新增"> <i class="fa fa-info"></i>
+                </a>
+                <button type="button" data-toggle="tooltip" title="" class="btn btn-success" onclick="confirm('确认？') ? $('#form-search').submit() : false;" data-original-title="制作">
+                    <i class="fa fa-save"></i>
+                </button>
+            </div>
+            <h1>CRUD生成器</h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-list"></i>
+                    CRUD生成器
+                </h3>
+            </div>
+            <div class="panel-body" >
+                <div class="well">
+                    <div class="row">
+                        <form action="/back/make/generate" id="form-search" method="post">
+                                <div class=" col-sm-12 form-group">
+                                    <label class="control-label" for="table">表名</label>
+                                    <input type="text" name="table" placeholder="表名" id="table" class="form-control">
+                                </div>
+                                <div class="col-sm-12 form-group">
+                                    <label class="control-label" for="comment">标签</label>
+                                    <input type="text" name="comment" value="" placeholder="标签" id="comment" class="form-control">
+                                </div>
+                                <div class="col-sm-12 form-group">
+                                    <div class="col-sm-2 " >字段</div>
+                                    <div class="col-sm-2 " >名称</div>
+                                    <div class="col-sm-1 " >列表</div>
+                                    <div class="col-sm-1 " >排序</div>
+                                    <div class="col-sm-1 " >搜索</div>
+                                    <div class="col-sm-1 " >设置</div>
+                                    <div class="col-sm-1 " >必须</div>
+                                    <div class="col-sm-3 " >长度</div>
+                                </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    function getInfo(){
+        $url = "{:url('/back/make/info')}";
+        $data = {
+          table:$('#table').val()
+        };
+        $.get($url,$data,function(resp) {
+                console.log(resp);
+
+            // 表名称
+            //$('#input-comment').val(resp.comment);
+
+            // 字段
+            // 清空已有字段
+            $('#form-search div.form-group:gt(2)').remove();
+            // 遍历全部字段
+            $('#comment').val(resp.comment);
+                $.each(resp.fields, function(i, field) {
+                var html = '';
+                html += '<div class="form-group col-sm-12">';
+                html += '<div class="col-sm-2">';
+                html += '<input type="text" class="form-control" name="fields['+i+'][name]" value="'+field.column_name+'" readonly>';
+                html += '</div>';
+                html += '<div class="col-sm-2">';
+                html += '<input type="text" class="form-control" name="fields['+i+'][comment]" value="'+field.column_comment+'">';
+                html += '</div>';
+                html += '<div class="col-sm-1">';
+                html += '<input type="checkbox" class="form-control" name="fields['+i+'][index]" value="1"' + ($.inArray(field.column_name, ['update_time', 'create_time', 'id'])!=-1?'':' checked ') +'>';
+                html += '</div>';
+                html += '<div class="col-sm-1">';
+                html += '<input type="checkbox" class="form-control" name="fields['+i+'][order]" value="1"'+($.inArray(field.column_name, ['update_time', 'create_time', 'id'])!=-1?'':' checked ')+'>';
+                html += '</div>';
+                html += '<div class="col-sm-1">';
+                html += '<input type="checkbox" class="form-control" name="fields['+i+'][search]" value="1"'+($.inArray(field.column_name, ['update_time', 'create_time', 'id', 'sort'])!=-1?'':' checked ')+'>';
+                html += '</div>';
+                html += '<div class="col-sm-1">';
+                html += '<input type="checkbox" class="form-control" name="fields['+i+'][set]" value="1"'+($.inArray(field.column_name, ['update_time', 'create_time', 'id'])!=-1?'':' checked ')+'>';
+                html += '</div>';
+                html += '<div class="col-sm-1">';
+                html += '<input type="checkbox" class="form-control" name="fields['+i+'][require]" value="1">';
+                html += '</div>';
+                html += '<div class="col-sm-3">';
+                html += '<input type="number" class="form-control" name="fields['+i+'][maxLength]" value="'+field.CHARACTER_MAXIMUM_LENGTH+'" '+(!(field.CHARACTER_MAXIMUM_LENGTH>0)?'disabled=disabled':'')+'>';
+                html += '</div>';
+                html += '</div>';
+
+                // 加入表单
+                $('#form-search').append(html);
+            });
+        },'json');
+    }
+</script>
+

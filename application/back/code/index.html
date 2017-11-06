@@ -1,0 +1,104 @@
+{extend name="common/layout" /}
+
+{block name="content"}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <a href="{:url('set')}" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="新增"> <i class="fa fa-plus"></i>
+                </a>
+                <button type="button" data-toggle="tooltip" title="" class="btn btn-danger" onclick="confirm('确认？') ? $('#form-index').submit() : false;" data-original-title="删除">
+                    <i class="fa fa-trash-o"></i>
+                </button>
+            </div>
+            <h1>%name%管理</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="">首页</a>
+                </li>
+                <li>
+                    <a href="">%name%管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-list"></i>
+                    %name%列表
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="well">
+                    <div class="row">
+                        <form action="index" id="form-search">
+                        %indexSearch%
+                            <div class="col-sm-12">
+                                <button type="button" onclick="$('#form-search').submit()" id="button-filter" class="btn btn-primary pull-right">
+                                    <i class="fa fa-search"></i>
+                                    筛选
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+                <form action="del" method="post" enctype="multipart/form-data" id="form-index">
+                    {:token()}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <td style="width: 1px;" class="text-center">
+                                    <input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);">
+                                </td>
+                                %indexField%
+                                <td class="text-right">管理</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if condition="$data->total()>0"}
+                                {foreach $data as $v}
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="checkbox" name="selected[]" value="{$v['id']}">
+                                    </td>
+                                    %fieldVal%
+                                    <td class="text-right">
+                                        <a href="/back/%table%/set?id={$v['id']}" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="编辑">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        <a href="back/%table%/del?id={$v['id']}" onclick="javascript:(confirm('是否删除'))" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="禁用">
+                                            <i class="fa">O</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {/foreach}
+                            {else}
+                                <tr><td class="text-center" colspan="6">无记录</td></tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-sm-6 text-left">
+                        {$data->render()}
+                    </div>
+                    <div class="col-sm-6 text-right">显示开始 {$start} 到 {$end} 之 {$data->total()}（总 {$data->lastPage()} 页）</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="title"}%name%列表{/block}
+
+{block name="appendCss"}
+{/block}
+
+{block name="appendJs"}
+{/block}
